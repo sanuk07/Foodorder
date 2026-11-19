@@ -495,9 +495,9 @@ body {
 }
 .customer-brand { display:flex; align-items:center; gap:11px; min-width:0; color:var(--ink); text-decoration:none; }
 .customer-brand-mark {
-  display:grid; place-items:center; flex:0 0 auto; width:43px; height:43px;
-  border-radius:15px; background:linear-gradient(135deg,#e23744,#c42734);
-  color:#fff; font-size:23px; box-shadow:5px 6px 13px rgba(226,55,68,.20), inset 1px 1px 0 rgba(255,255,255,.18);
+  display:block; flex:0 0 auto; width:48px; height:48px; object-fit:cover;
+  border-radius:50%; background:#fff; border:2px solid rgba(255,255,255,.9);
+  box-shadow:0 4px 12px rgba(34,28,20,.12);
 }
 .customer-brand strong { display:block; font-size:16px; line-height:1.2; letter-spacing:-.03em; }
 .customer-brand small { display:block; margin-top:3px; color:var(--muted); font-size:11px; }
@@ -516,6 +516,17 @@ body {
 }
 .customer-track-btn:hover { background:#c92835; transform:translateY(-1px); }
 .customer-track-btn:active { transform:scale(.98); }
+.customer-help-btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:40px;
+  padding:9px 12px; border:1px solid rgba(255,255,255,.9); border-radius:12px;
+  background:rgba(255,255,255,.76); color:var(--ink); font-size:12px; font-weight:850;
+  text-decoration:none; white-space:nowrap;
+  box-shadow:4px 4px 10px rgba(189,182,171,.14),-3px -3px 9px rgba(255,255,255,.72);
+  transition:transform .18s ease, color .18s ease, background .18s ease;
+}
+.customer-help-btn:hover { color:#b51e2a; background:rgba(255,255,255,.96); transform:translateY(-1px); }
+.customer-help-btn:active { transform:scale(.98); }
+.customer-help-btn:focus-visible { outline:3px solid rgba(226,55,68,.25); outline-offset:3px; }
 .page { padding-top:22px; }
 .customer-welcome {
   display:flex; align-items:end; justify-content:space-between; gap:18px; margin:2px 0 18px;
@@ -624,6 +635,9 @@ body {
 .pay { box-shadow:5px 6px 13px rgba(226,55,68,.20),inset 1px 1px 0 rgba(255,255,255,.18); }
 .token { box-shadow:0 12px 26px rgba(29,29,31,.18),inset 0 1px 0 rgba(255,255,255,.12); }
 footer { padding-bottom:10px; }
+footer a { display:inline-block; color:inherit; text-decoration:none; cursor:pointer; transition:color .18s ease; }
+footer a:hover { color:var(--red); text-decoration:underline; }
+footer a:focus-visible { outline:3px solid rgba(226,55,68,.25); outline-offset:4px; border-radius:5px; }
 
 @media (max-width:900px) {
   .menu-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
@@ -631,14 +645,23 @@ footer { padding-bottom:10px; }
   .brand { grid-column:1/-1; min-height:145px; }
   .state,.track-tile { min-height:130px; }
 }
+@media (max-width:420px) {
+  .customer-topbar { gap:8px; }
+  .customer-online { display:none; }
+  .customer-brand small { display:none; }
+  .customer-top-actions { gap:5px; }
+  .customer-help-btn { gap:4px; padding:8px 7px; font-size:10px; }
+  .customer-track-btn { gap:5px; padding:8px 8px; font-size:10px; }
+}
 @media (max-width:760px) {
   .customer-topbar { min-height:60px; padding:9px 12px; }
-  .customer-brand-mark { width:38px; height:38px; border-radius:13px; font-size:20px; }
+  .customer-brand-mark { width:40px; height:40px; border-radius:50%; }
   .customer-brand strong { font-size:14px; }
   .customer-brand small { font-size:10px; }
   .customer-top-actions { gap:6px; }
   .customer-online { padding:7px 8px; font-size:10px; }
   .customer-track-btn { min-height:36px; padding:8px 10px; font-size:11px; }
+  .customer-help-btn { min-height:36px; padding:8px 9px; font-size:10px; }
   .page { padding:17px 12px 120px; }
   .customer-welcome { align-items:flex-start; flex-direction:column; gap:8px; margin-bottom:13px; }
   .customer-welcome h2 { font-size:25px; }
@@ -709,11 +732,12 @@ footer { padding-bottom:10px; }
 
 <header class="customer-topbar">
   <a class="customer-brand" href="#menuTitle" aria-label="Mosa Choumin home">
-    <span class="customer-brand-mark" aria-hidden="true">🍜</span>
+    <img class="customer-brand-mark" src="mosachaumin-logo.png" alt="Mausa Chowmein logo">
     <span><strong>MOSA CHOUMIN</strong><small>Food Court · Order online</small></span>
   </a>
   <div class="customer-top-actions">
     <span class="customer-online" id="customerStoreBadge">Checking store…</span>
+    <a class="customer-help-btn" href="https://wa.me/917764018216?text=HELP" target="_blank" rel="noopener noreferrer" aria-label="Need help? Chat with us on WhatsApp">Need help? <span aria-hidden="true">↗</span></a>
     <button class="customer-track-btn" type="button" data-goto="track">Track order <span aria-hidden="true">↗</span></button>
   </div>
 </header>
@@ -796,7 +820,7 @@ footer { padding-bottom:10px; }
     </div>
   </section>
 
-  <footer>© <span id="year"></span>MOSA CHOUMIN · Made with ❤️ by SANU KUMAR</footer>
+  <footer><a href="https://wa.me/916204522977?text=Hi%2C%20Sanu" target="_blank" rel="noopener noreferrer" aria-label="Message Sanu Kumar on WhatsApp">© <span id="year"></span>MOSA CHOUMIN · Made with ❤️ by SANU KUMAR</a></footer>
 </main>
 
 <div id="fcart" class="fcart" aria-live="polite">
@@ -1119,16 +1143,29 @@ function setType(t) {
 }
 
 /* ---------- sheet ---------- */
+let sheetHistoryOpen = false;
 function openSheet() {
   lastFocus = document.activeElement;
+  if (!$("overlay").classList.contains("open") && !sheetHistoryOpen) {
+    history.pushState({ ...(history.state || {}), mosaSheet: true }, "");
+    sheetHistoryOpen = true;
+  }
   $("overlay").classList.add("open"); $("overlay").setAttribute("aria-hidden", "false"); document.body.classList.add("lock");
   $("closeSheet").focus();
 }
-function closeSheet() {
+function closeSheet(fromPopState = false) {
+  const wasOpen = $("overlay").classList.contains("open");
   $("overlay").classList.remove("open"); $("overlay").setAttribute("aria-hidden", "true"); document.body.classList.remove("lock");
   $("sheet").classList.remove("done"); $("sheetTitle").textContent = "Your order"; formError("");
   lastFocus?.focus?.();
+  if (wasOpen && sheetHistoryOpen) {
+    sheetHistoryOpen = false;
+    if (!fromPopState && history.state?.mosaSheet) history.back();
+  }
 }
+window.addEventListener("popstate", () => {
+  if (sheetHistoryOpen && $("overlay").classList.contains("open")) closeSheet(true);
+});
 
 /* ---------- location & distance ---------- */
 const hasShop = () => [config?.shopLat, config?.shopLng].every(v => v != null && v !== "" && Number.isFinite(Number(v)));
@@ -1254,13 +1291,23 @@ function renderOrder(target, o) {
   if (o.date || o.time) meta.push([o.date, o.time].filter(Boolean).join(" · "));
   if (o.items) meta.push("Items: " + o.items);
   if (o.type) meta.push("Order type: " + String(o.type).replace(/-/g, " "));
+  if (isDel) {
+    const deliveryFee = Number(o.deliveryFee) || 0;
+    meta.push("Delivery charges: " + (deliveryFee === 0 ? "Free" : rupees(deliveryFee)));
+  }
   meta.push("Total: " + rupees(o.total));
   if (isDel && Number.isFinite(Number(o.distanceKm))) meta.push("Approx. kitchen distance: " + Number(o.distanceKm).toFixed(2) + " km");
+  const statusMessage = st === "NEW"
+    ? `<div class="status warn" style="margin-top:12px">Your order will take about 30 minutes.</div>`
+    : st === "READY"
+      ? `<div class="status ok" style="margin-top:12px">${isDel ? "Your order is ready. The rider will reach you soon." : "Your order is ready for pickup."}</div>`
+      : "";
   const again = target.id === "recent" && (store.get(K.last, []) || []).some(x => byId.get(String(x.id))?.available === true)
     ? `<button class="btn alt" data-again>🔁 Order again</button>` : "";
   target.innerHTML = `
     <div class="top"><b>${esc(o.orderId || "Order")}</b><span class="pill${st === "CANCELLED" ? " bad" : ""}">${esc(st.replace(/_/g, " "))}</span></div>
     <p class="meta">${meta.map(esc).join("<br>")}</p>
+    ${statusMessage}
     ${st === "CANCELLED" ? `<p class="msg">This order has been cancelled. Please contact the food court if you need help.</p>`
       : `<div class="steps">${STEPS.map(([, l], i) => `<div class="${idx >= i ? "done" : ""}"><span></span>${l}</div>`).join("")}</div>${idx < 0 ? `<p class="msg">Current status: ${esc(st)}</p>` : ""}`}
     ${isDel && /^https?:\/\//.test(o.map || "") ? `<a class="link" href="${esc(o.map)}" target="_blank" rel="noopener noreferrer">Open delivery route in Google Maps ↗</a>` : ""}
