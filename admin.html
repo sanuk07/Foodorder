@@ -46,7 +46,7 @@
     /* Login */
     .login-wrap { min-height: 100svh; display: grid; place-items: center; padding: 22px; background: radial-gradient(circle at 5% 5%, #ffe5bf 0, transparent 34%), radial-gradient(circle at 98% 90%, #f9dce0 0, transparent 32%), var(--page); }
     .login-card { width: min(100%, 410px); background: white; border: 1px solid rgba(255,255,255,.85); box-shadow: 0 22px 70px rgba(35,27,17,.12); border-radius: 28px; padding: 28px; animation: appear .36s ease both; }
-    .brand-mark { display: grid; place-items: center; width: 58px; height: 58px; border-radius: 19px; background: var(--red); color: white; font-size: 30px; box-shadow: 0 8px 18px rgba(226,55,68,.2); }
+    .brand-mark { display: block; width: 76px; height: 76px; object-fit: cover; border-radius: 50%; background: white; border: 2px solid #fff; box-shadow: 0 8px 18px rgba(35,27,17,.12); }
     .login-card h1 { margin: 18px 0 6px; font-size: 27px; letter-spacing: -.04em; }
     .login-card p { margin: 0 0 22px; color: var(--muted); }
     .field { display: grid; gap: 7px; min-width: 0; }
@@ -61,7 +61,7 @@
     .app { min-height: 100svh; }
     .topbar { position: sticky; z-index: 20; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px max(18px, calc((100vw - 1240px)/2)); background: rgba(241,238,232,.88); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(216,210,201,.7); }
     .brand-inline { display: flex; align-items: center; gap: 11px; min-width: 0; }
-    .brand-mini { display: grid; place-items: center; flex: 0 0 auto; width: 43px; height: 43px; border-radius: 15px; background: var(--red); color: white; font-size: 23px; }
+    .brand-mini { display: block; flex: 0 0 auto; width: 48px; height: 48px; object-fit: cover; border-radius: 50%; background: white; border: 1px solid rgba(255,255,255,.9); box-shadow: 0 4px 12px rgba(35,27,17,.10); }
     .brand-inline h1 { margin: 0; font-size: 16px; letter-spacing: -.03em; }
     .brand-inline .small { margin-top: 1px; }
     .main-nav { display: flex; align-items: center; gap: 4px; padding: 4px; border-radius: 14px; background: rgba(226,221,212,.75); }
@@ -205,7 +205,7 @@
       .topbar { padding: 10px 12px; gap: 8px; flex-wrap: wrap; }
       .main-nav { order: 3; flex: 1 0 100%; display: grid; grid-template-columns: 1fr 1fr; }
       .main-nav button { min-height: 35px; }
-      .brand-mini { width: 38px; height: 38px; border-radius: 13px; font-size: 20px; }
+      .brand-mini { width: 40px; height: 40px; }
       .brand-inline h1 { font-size: 14px; }
       .brand-inline .small { font-size: 10px; }
       .connection { display: none; }
@@ -448,7 +448,7 @@
 
   <section id="loginView" class="login-wrap">
     <form id="loginForm" class="login-card" autocomplete="on">
-      <div class="brand-mark" aria-hidden="true">🍔</div>
+      <img class="brand-mark" src="mosachaumin-logo.png" alt="Mausa Chowmein logo">
       <div class="eyebrow" style="margin-top:20px">FOOD COURT MANAGEMENT</div>
       <h1>Welcome back.</h1>
       <p>Sign in to manage incoming orders and update your menu.</p>
@@ -465,8 +465,8 @@
   <div id="appView" class="app hidden">
     <header class="topbar">
       <div class="brand-inline">
-        <div class="brand-mini" aria-hidden="true">🍔</div>
-        <div><h1>Food Court <span style="font-weight:500;color:var(--muted)">/ Admin</span></h1><div class="small muted">Orders and menu control</div></div>
+        <img class="brand-mini" src="mosachaumin-logo.png" alt="Mausa Chowmein logo">
+        <div><h1>Mausa Chowmein <span style="font-weight:500;color:var(--muted)">/ Admin</span></h1><div class="small muted">Orders and menu control</div></div>
       </div>
       <nav class="main-nav" id="mainNav" aria-label="Admin sections">
         <button type="button" data-view="orders" class="active">🧾 Orders</button>
@@ -502,7 +502,7 @@
             </div>
             <span id="alarmStateBadge" class="alarm-state">Sound off</span>
           </div>
-          <p id="alarmStatusText" class="alarm-description">Turn on sound to hear a buzzer when a new order arrives. Keep this admin page open.</p>
+          <p id="alarmStatusText" class="alarm-description">Turn on sound to play your notification audio for 10 seconds when a new order arrives. Keep this admin page open.</p>
         </div>
         <div class="alarm-controls">
           <label class="alarm-toggle" for="alarmEnabledToggle">
@@ -667,9 +667,8 @@
     /* ---------- New-order sound alert (Web Audio; no external audio file) ---------- */
     const ALARM_STORAGE_KEY = 'foodcourt_admin_alarm_settings_v1';
     let alarmSettings = { enabled: false, volume: 65 };
-    let alarmAudioContext = null;
-    let alarmNodes = [];
-    let alarmTimers = [];
+    let alarmAudio = null;
+    let alarmStopTimer = null;
 
     function loadAlarmSettings() {
       try {
@@ -696,60 +695,43 @@
       $('alarmStateBadge').textContent = alarmSettings.enabled ? 'Sound on' : 'Sound off';
       $('alarmStateBadge').classList.toggle('on', alarmSettings.enabled);
       $('alarmStatusText').textContent = alarmSettings.enabled
-        ? 'Sound alerts are enabled. New orders are checked about every 20 seconds while this admin page is open.'
-        : 'Turn on sound to hear a buzzer when a new order arrives. Keep this admin page open.';
+        ? 'Sound alerts are enabled. Your notification audio plays for 10 seconds when a new order arrives.'
+        : 'Turn on sound to play your notification audio for 10 seconds when a new order arrives. Keep this admin page open.';
     }
 
     async function getAlarmAudioContext() {
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContextClass) throw new Error('This browser does not support sound alerts.');
-      if (!alarmAudioContext) alarmAudioContext = new AudioContextClass();
-      if (alarmAudioContext.state === 'suspended') await alarmAudioContext.resume();
-      return alarmAudioContext;
+      if (!alarmAudio) {
+        alarmAudio = new Audio('universfield-notification-01-126509.mp3');
+        alarmAudio.preload = 'auto';
+        alarmAudio.loop = true;
+      }
+      alarmAudio.volume = Math.max(0, Math.min(1, alarmSettings.volume / 100));
+      return alarmAudio;
     }
 
     function stopOrderAlarm() {
-      alarmTimers.forEach(timer => window.clearTimeout(timer));
-      alarmTimers = [];
-      alarmNodes.forEach(node => { try { node.stop(); } catch (_) { /* Already stopped. */ } });
-      alarmNodes = [];
+      if (alarmStopTimer !== null) {
+        window.clearTimeout(alarmStopTimer);
+        alarmStopTimer = null;
+      }
+      if (alarmAudio) {
+        alarmAudio.pause();
+        try { alarmAudio.currentTime = 0; } catch (_) { /* Audio may not be ready yet. */ }
+      }
     }
 
-    function playOneBuzz(frequency) {
-      if (!alarmSettings.enabled || !alarmAudioContext) return;
-      const ctx = alarmAudioContext;
-      const now = ctx.currentTime;
-      const oscillator = ctx.createOscillator();
-      const gain = ctx.createGain();
-      const peak = Math.max(0.0001, (alarmSettings.volume / 100) * 0.13);
-      oscillator.type = 'square';
-      oscillator.frequency.setValueAtTime(frequency, now);
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(peak, now + 0.018);
-      gain.gain.setValueAtTime(peak, now + 0.13);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
-      oscillator.connect(gain);
-      gain.connect(ctx.destination);
-      oscillator.onended = () => {
-        alarmNodes = alarmNodes.filter(node => node !== oscillator);
-        try { oscillator.disconnect(); gain.disconnect(); } catch (_) { /* Already disconnected. */ }
-      };
-      alarmNodes.push(oscillator);
-      oscillator.start(now);
-      oscillator.stop(now + 0.26);
-    }
-
-    function playOrderAlarm() {
+    async function playOrderAlarm() {
       if (!alarmSettings.enabled) return;
       stopOrderAlarm();
-      const pattern = [
-        [0, 560], [320, 440], [650, 560],
-        [1450, 560], [1770, 440], [2100, 560]
-      ];
-      pattern.forEach(([delay, frequency]) => {
-        const timer = window.setTimeout(() => playOneBuzz(frequency), delay);
-        alarmTimers.push(timer);
-      });
+      try {
+        const audio = await getAlarmAudioContext();
+        audio.currentTime = 0;
+        audio.volume = Math.max(0, Math.min(1, alarmSettings.volume / 100));
+        await audio.play();
+        alarmStopTimer = window.setTimeout(stopOrderAlarm, 10000);
+      } catch (error) {
+        console.warn('Could not play the new-order alert:', error);
+      }
     }
 
     async function testOrderAlarm() {
@@ -758,7 +740,7 @@
       try {
         await getAlarmAudioContext();
         playOrderAlarm();
-        toast('Test sound is playing');
+        toast('Test sound is playing for 10 seconds');
       } catch (error) {
         alarmSettings.enabled = false;
         saveAlarmSettings();
@@ -1084,7 +1066,12 @@
       if (!ordersSelected) loadMenu({ quiet: true });
     }
 
+    let menuModalHistoryOpen = false;
     function openMenuModal(item = null) {
+      if ($('menuModalOverlay').classList.contains('hidden') && !menuModalHistoryOpen) {
+        history.pushState({ ...(history.state || {}), mosaMenuModal: true }, '');
+        menuModalHistoryOpen = true;
+      }
       $('menuForm').reset();
       $('editMenuId').value = item ? item.id : '';
       $('menuName').value = item ? item.name : '';
@@ -1103,10 +1090,18 @@
       window.setTimeout(() => $('menuName').focus(), 80);
     }
 
-    function closeMenuModal() {
+    function closeMenuModal(fromPopState = false) {
+      const wasOpen = !$('menuModalOverlay').classList.contains('hidden');
       $('menuModalOverlay').classList.add('hidden');
       $('menuFormMessage').textContent = '';
+      if (wasOpen && menuModalHistoryOpen) {
+        menuModalHistoryOpen = false;
+        if (!fromPopState && history.state?.mosaMenuModal) history.back();
+      }
     }
+    window.addEventListener('popstate', () => {
+      if (menuModalHistoryOpen && !$('menuModalOverlay').classList.contains('hidden')) closeMenuModal(true);
+    });
 
     async function compressMenuImage(file) {
       if (!file) return '';
